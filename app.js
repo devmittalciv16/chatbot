@@ -59,12 +59,7 @@ app.post("/inbound", async(req, res) => {
 			let world_total = data.data;
 			let result = world_total["TotalDeaths"];
 			messageBody = `Total Deaths ${result}`;
-			client.messages
-				.create({
-					from: "whatsapp:+14155238886",
-					body: messageBody,
-					to: sendTo
-				}).then(data=>console.log(data));
+			sendMessage(messageBody, sendTo);
 		})
 	}else if(query.split(" ")[0] === "CASES"){
 		let code = query.split(" ")[1];
@@ -74,12 +69,7 @@ app.post("/inbound", async(req, res) => {
 			let size_ = data.data.length;
 			let result = data.data[size_-1]["Active"];
 			messageBody = `${code} Active Cases ${result}`;
-			client.messages
-				.create({
-					from: "whatsapp:+14155238886",
-					body: messageBody,
-					to: sendTo
-				}).then(data=>console.log(data));
+			sendMessage(messageBody, sendTo);
 			
 		})
 	}else if(query.split(" ")[0] === "DEATHS"){
@@ -90,12 +80,7 @@ app.post("/inbound", async(req, res) => {
 			let size_ = data.data.length;
 			let result = data.data[size_-1]["Deaths"];
 			messageBody = `${code} Deaths ${result}`;
-			client.messages
-				.create({
-					from: "whatsapp:+14155238886",
-					body: messageBody,
-					to: sendTo
-				}).then(data=>console.log(data));
+			sendMessage(messageBody, sendTo);
 		})
 	}else{
 		messageBody = `Seems like you typed the wrong query. 
@@ -104,12 +89,7 @@ app.post("/inbound", async(req, res) => {
 				2. CASES TOTAL
 				3. DEATHS <country-code>
 				4. CASES <country-code>`
-		client.messages
-		.create({
-			from: "whatsapp:+14155238886",
-			body: messageBody,
-			to: sendTo
-		}).then(data=>console.log(data));
+		sendMessage(messageBody, sendTo);
 	}
 	
 
