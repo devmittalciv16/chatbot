@@ -2,8 +2,8 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const axios = require("axios");
 const app = express();
-const accountSid = "AC1c09f24d54bf4637bed1da816f47d468";
-const authToken = "646b8246eeb1ea4c51d47162cac647c8";
+const accountSid = "AC976f1515629124710e74ba3638a42072";
+const authToken = "37e7435fdacd64e0492b5ea6c303c4f4";
 const twilioWhatsappNumber = "+14155238886";
 const client = require("twilio")(accountSid, authToken);
 
@@ -38,12 +38,17 @@ app.post("/inbound", async(req, res) => {
 	let query = req.body.Body;
 	let messageBody="null";
 	
+	if(!sendTo){
+		res.sendStatus(200);
+		return;
+	}
 	if(query === "CASES TOTAL"){
 		await axios.get("https://api.covid19api.com/world/total").then(async(data, err)=>{
 			if(err)res.sendStatus(404);
 			let world_total = data.data;
 			let result = world_total["TotalConfirmed"] - world_total["TotalDeaths"]-world_total["TotalRecovered"];
 			messageBody = `Total Active Cases ${result}`;
+
 			client.messages
 				.create({
 					from: "whatsapp:+14155238886",
@@ -112,7 +117,7 @@ app.post("/inbound", async(req, res) => {
 
 	
 });
-
-app.listen(3000, () => {
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
 	console.log("server connected");
 });
