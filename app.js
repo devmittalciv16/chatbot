@@ -36,7 +36,8 @@ const sendMessage = (messageBody, sendTo)=>{
 	}).then(data=>console.log(data));
 }
 
-app.post("/inbound", async(req, res) => {
+
+app.post("/inbound", (req, res) => {
 
 	let sendTo = req.body.From;
 	let query = req.body.Body;
@@ -46,8 +47,10 @@ app.post("/inbound", async(req, res) => {
 		res.sendStatus(200);
 		return;
 	}
+
+
 	if(query === "CASES TOTAL"){
-		await axios.get("https://api.covid19api.com/world/total").then(async(data, err)=>{
+		axios.get("https://api.covid19api.com/world/total").then((data, err)=>{
 			if(err)res.sendStatus(404);
 			let world_total = data.data;
 			let result = world_total["TotalConfirmed"] - world_total["TotalDeaths"]-world_total["TotalRecovered"];
@@ -55,7 +58,7 @@ app.post("/inbound", async(req, res) => {
 			sendMessage(messageBody, sendTo);
 		})
 	}else if(query === "DEATHS TOTAL"){
-		await axios.get("https://api.covid19api.com/world/total").then(data=>{
+		axios.get("https://api.covid19api.com/world/total").then(data=>{
 			let world_total = data.data;
 			let result = world_total["TotalDeaths"];
 			messageBody = `Total Deaths ${result}`;
@@ -82,6 +85,10 @@ app.post("/inbound", async(req, res) => {
 			messageBody = `${code} Deaths ${result}`;
 			sendMessage(messageBody, sendTo);
 		})
+	}else if(query ==="Wakeup"){
+			messageBody = `I'm awake now, you can ask covid data now`;
+			sendMessage(messageBody, sendTo);
+		
 	}else{
 		messageBody = `Seems like you typed the wrong query. 
 				You can do four operations, 
