@@ -27,7 +27,7 @@ const getCountryByCode = (code)=>{
 	return countryArray[code];
 }
 
-sendMessage(messageBody, sendTo)=>{
+const sendMessage = (messageBody, sendTo)=>{
 	client.messages
 	.create({
 		from: "whatsapp:+14155238886",
