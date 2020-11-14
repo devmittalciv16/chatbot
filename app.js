@@ -28,73 +28,87 @@ const getCountryByCode = (code)=>{
 }
 
 const sendMessage=(msgbody, sendTo)=>{
-	client.messages
-		.create({
-			from: "whatsapp:+14155238886",
-			body: msgbody,
-			to: sendTo
-		})
-		.then((message) => console.log(message.sid));
+
 }
 
 
-app.post("/inbound", (req, res) => {
+app.post("/inbound", async(req, res) => {
 
 	let sendTo = req.body.From;
-	let query = String(req.body.Body);
+	let query = req.body.Body;
+	let messageBody="null";
 	
 	if(query === "CASES TOTAL"){
-		axios.get("https://api.covid19api.com/world/total").then((data, err)=>{
+		await axios.get("https://api.covid19api.com/world/total").then(async(data, err)=>{
 			if(err)res.sendStatus(404);
 			let world_total = data.data;
 			let result = world_total["TotalConfirmed"] - world_total["TotalDeaths"]-world_total["TotalRecovered"];
-			let messageBody = `Total Active Cases ${result}`;
-			sendMessage(messageBody, sendTo);
-			res.send(200);
+			messageBody = `Total Active Cases ${result}`;
+			client.messages
+				.create({
+					from: "whatsapp:+14155238886",
+					body: messageBody,
+					to: sendTo
+				}).then(data=>console.log(data));
 		})
-	}
-	if(query === "DEATHS TOTAL"){
-		axios.get("https://api.covid19api.com/world/total").then(data=>{
+	}else if(query === "DEATHS TOTAL"){
+		await axios.get("https://api.covid19api.com/world/total").then(data=>{
 			let world_total = data.data;
 			let result = world_total["TotalDeaths"];
-			let messageBody = `Total Deaths ${result}`;
-			sendMessage(messageBody, sendTo);
-			res.send(200);
+			messageBody = `Total Deaths ${result}`;
+			client.messages
+				.create({
+					from: "whatsapp:+14155238886",
+					body: messageBody,
+					to: sendTo
+				}).then(data=>console.log(data));
 		})
-	}
-	if(query.split(" ")[0] === "CASES"){
+	}else if(query.split(" ")[0] === "CASES"){
 		let code = query.split(" ")[1];
 		let country = getCountryByCode(code);
 		if(country == null)res.send(404);
 		axios.get(`https://api.covid19api.com/total/country/${country}`).then(data=>{
 			let size_ = data.data.length;
 			let result = data.data[size_-1]["Active"];
-			let messageBody = `${code} Active Cases ${result}`;
-			sendMessage(messageBody, sendTo);	
-			res.send(200);	
+			messageBody = `${code} Active Cases ${result}`;
+			client.messages
+				.create({
+					from: "whatsapp:+14155238886",
+					body: messageBody,
+					to: sendTo
+				}).then(data=>console.log(data));
+			
 		})
-	}
-	if(query.split(" ")[0] === "DEATHS"){
+	}else if(query.split(" ")[0] === "DEATHS"){
 		let code = query.split(" ")[1];
 		let country = getCountryByCode(code);
 		if(country == null)res.send(404);
 		axios.get(`https://api.covid19api.com/total/country/${country}`).then(data=>{
 			let size_ = data.data.length;
 			let result = data.data[size_-1]["Deaths"];
-			let messageBody = `${code} Deaths ${result}`;
-			sendMessage(messageBody, sendTo);
-			res.send(200);	
+			messageBody = `${code} Deaths ${result}`;
+			client.messages
+				.create({
+					from: "whatsapp:+14155238886",
+					body: messageBody,
+					to: sendTo
+				}).then(data=>console.log(data));
 		})
-	}
-
-	let msg = `Seems like you typed the wrong query. 
+	}else{
+		messageBody = `Seems like you typed the wrong query. 
 				You can do four operations, 
 				1. DEATHS TOTAL
 				2. CASES TOTAL
 				3. DEATHS <country-code>
 				4. CASES <country-code>`
-	sendMessage(msg, sendTo);
-	res.send(200);
+		client.messages
+		.create({
+			from: "whatsapp:+14155238886",
+			body: messageBody,
+			to: sendTo
+		}).then(data=>console.log(data));
+	}
+	
 
 	
 });
