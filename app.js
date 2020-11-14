@@ -27,10 +27,14 @@ const getCountryByCode = (code)=>{
 	return countryArray[code];
 }
 
-const sendMessage=(msgbody, sendTo)=>{
-
+sendMessage(messageBody, sendTo)=>{
+	client.messages
+	.create({
+		from: "whatsapp:+14155238886",
+		body: messageBody,
+		to: sendTo
+	}).then(data=>console.log(data));
 }
-
 
 app.post("/inbound", async(req, res) => {
 
@@ -48,13 +52,7 @@ app.post("/inbound", async(req, res) => {
 			let world_total = data.data;
 			let result = world_total["TotalConfirmed"] - world_total["TotalDeaths"]-world_total["TotalRecovered"];
 			messageBody = `Total Active Cases ${result}`;
-
-			client.messages
-				.create({
-					from: "whatsapp:+14155238886",
-					body: messageBody,
-					to: sendTo
-				}).then(data=>console.log(data));
+			sendMessage(messageBody, sendTo);
 		})
 	}else if(query === "DEATHS TOTAL"){
 		await axios.get("https://api.covid19api.com/world/total").then(data=>{
